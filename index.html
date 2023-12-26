@@ -55,6 +55,11 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="column">
+                    <div class="ui center aligned container">
+                        <img src="./frag.png" width="400px;">
+                    </div>
+                </div>
             </div>
             <div class="ui vertical divider"></div>
         </div>
@@ -62,7 +67,7 @@
         <div class="ui segment">
             <div class="ui two column very relaxed grid">
               <div class="column">
-                <h3>Stat Conversion<i v-tooltip data-content="Please input the stats of your character. You can also use the default values, which is for my character :-)" class="info circle icon"></i></h3>
+                <h3>Stat Conversion<i v-tooltip data-content="Please input the stats of your character. You can also use the default values, which are for my character :-)" class="info circle icon"></i></h3>
                 <table class="ui table">
                     <tr><td>1 mainstat% </td><td>= </td>
                         <td><div class="ui small input" style="width: 100px;"><input v-model.number="msp2ms" type="number" min="0" max="100"></div> main stat
@@ -72,29 +77,29 @@
                             <i v-tooltip data-content="This is the same as the FLAME score calculation. " class="info circle icon"></i></td></tr>
                     <tr><td>8 crit damage </td><td>= </td>
                         <td><div class="ui small input" style="width: 100px;"><input v-model.number="cdmg82msp" type="number" min="0" max="100"></div> mainstat% 
-                            <i v-tooltip data-content="In terms of glove potential, the 8 critdmg line is slightly better than 2 mstat% lines." class="info circle icon"></i></td></tr>
-                    <tr><td>40 boss </td><td>= </td>
+                            <i v-tooltip data-content="In terms of glove potential, the 8 critdmg line is better than 2 mstat% lines." class="info circle icon"></i></td></tr>
+                    <tr><td>40% boss </td><td>= </td>
                         <td><div class="ui small input" style="width: 100px;"><input v-model.number="boss402attp" type="number" min="0" max="100"></div> att% 
                             <i v-tooltip data-content="In terms of weapon potential, we always prefer 13 att% than 40 boss%." class="info circle icon"></i></td></tr>
-                    <tr><td>1 IED </td><td>= </td>
-                        <td><div class="ui small input" style="width: 100px;"><input v-model.number="ied2boss" type="number" min="0" max="100"></div> boss 
+                    <tr><td>1% IED </td><td>= </td>
+                        <td><div class="ui small input" style="width: 100px;"><input v-model.number="ied2boss" type="number" min="0" max="100"></div>% boss 
                             <i v-tooltip data-content="Just estimate how much IED you will need." class="info circle icon"></i></td></tr>
                     <tr><td>All mainstat% </td><td> :</td>
                         <td><div class="ui small input" style="width: 100px;"><input v-model.number="allmstatp" type="number" min="0" max="1000"></div> % 
                             <i v-tooltip data-content="Computed by the Weapon Jump Ring or Pinkbean Cups, or by hand." class="info circle icon"></i></td></tr>
                     <tr><td>All att </td><td> :</td>
                         <td><div class="ui small input" style="width: 100px;"><input v-model.number="allatt" type="number" min="0" max="100000"></div> att 
-                            <i v-tooltip data-content="Just look at your character stats." class="info circle icon"></i></td></tr>
+                            <i v-tooltip data-content="Just see your character stats." class="info circle icon"></i></td></tr>
                     <tr><td>All att% </td><td> :</td>
                         <td><div class="ui small input" style="width: 100px;"><input v-model.number="allattp" type="number" min="0" max="1000"></div> att% 
-                            <i v-tooltip data-content="Just look at your character stats." class="info circle icon"></i></td></tr>
+                            <i v-tooltip data-content="Just see your character stats." class="info circle icon"></i></td></tr>
                     <tr><td>All mainstat </td><td> :</td>
                         <td><div class="ui small input" style="width: 100px;"><input v-model.number="allmstat" type="number" min="0" max="200000"></div> main stat 
-                            <i v-tooltip data-content="Just look at your character stats." class="info circle icon"></i></td></tr>
+                            <i v-tooltip data-content="Just see your character stats." class="info circle icon"></i></td></tr>
                 </table>
               </div>
               <div class="column">
-                <h3>Score Estimate</h3>
+                <h3>Score Estimation</h3>
                 <table class="ui large table">
                     <tr><td>5 att </td><td>= </td><td> {{scatt5}} main stat</td></tr>
                     <tr><td>0.35% crit damage </td><td>= </td><td> {{sccd35}} main stat</td></tr>
@@ -117,9 +122,9 @@
                 <tbody>
                     <tr v-for="i,k in resultnum">
                         <td>Core {{k+1}}</td>
-                        <td>{{mains[k]}}x <div class="ui olive label" style="width:70px;">{{plan[k][0][0]}}</div> +{{plan[k][0][1]}} (= {{plan[k][0][2]}} m.stat)</td>
-                        <td>{{sec0s[k]}}x <div class="ui olive label" style="width:70px;">{{plan[k][1][0]}}</div> +{{plan[k][1][1]}} (= {{plan[k][1][2]}} m.stat)</td>
-                        <td>{{sec1s[k]}}x <div class="ui olive label" style="width:70px;">{{plan[k][2][0]}}</div> +{{plan[k][2][1]}} (= {{plan[k][2][2]}} m.stat)</td>
+                        <td>{{mains[k]}}x <div class="ui olive label" style="width:70px;">{{plan[k][0][0]}}</div> {{plan[k][0][1]}} (= {{plan[k][0][2]}} m.stat)</td>
+                        <td>{{sec0s[k]}}x <div class="ui olive label" style="width:70px;">{{plan[k][1][0]}}</div> {{plan[k][1][1]}} (= {{plan[k][1][2]}} m.stat)</td>
+                        <td>{{sec1s[k]}}x <div class="ui olive label" style="width:70px;">{{plan[k][2][0]}}</div> {{plan[k][2][1]}} (= {{plan[k][2][2]}} m.stat)</td>
                     </tr>
                 </tbody>
             </table>
@@ -143,18 +148,18 @@
         new Vue({
             el: '#app',
             data: {
-                mains: [6, 0, 0, 0, 0, 0],
+                mains: [5, 0, 0, 0, 0, 0],
                 sec0s: [8, 0, 0, 0, 0, 0],
-                sec1s: [6, 0, 0, 0, 0, 0],
+                sec1s: [7, 0, 0, 0, 0, 0],
                 msp2ms: 8,
                 att2ms: 2.5,
-                allmstatp: 713,
-                cdmg82msp: 25,
+                allmstatp: 794,
+                cdmg82msp: 32,
                 boss402attp: 10,
                 ied2boss: 0.9,
-                allatt: 8779,
+                allatt: 9102,
                 allattp: 126,
-                allmstat: 74075,
+                allmstat: 75317,
                 scatt5: 0, sccd35: 0, scms100: 0, scboss: 0, scied: 0, scdmg75: 0,
                 mainlevs: [0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 20],
                 result: 0,
@@ -245,7 +250,7 @@
                         for (let j=0; j < 3; j ++) {
                             let obj = plan[6*j+i]; 
                             let lev = (j == 0 ? this.mainlevs[this.mains[i]] : (j == 1 ? this.sec0s[i] : this.sec1s[i]));
-                            let num = nums[obj] * lev;
+                            let num = round2(nums[obj] * lev);
                             let equstat = round2(scs[obj] * lev);
                             let ifpr = "%";
                             if (obj == 0 || obj == 2) ifpr = "";
