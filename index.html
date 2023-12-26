@@ -3,58 +3,133 @@
 <head>
     <title>MapleStory HEXA Stat Calculator</title>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js"></script>
+    <style type="text/css">
+        body {
+          background-color: #FFFFFF;
+        }
+        .ui.menu .item img.logo {
+          margin-right: 1.5em;
+        }
+        .main.container {
+          margin-top: 4em;
+        }
+        .wireframe {
+          margin-top: 2em;
+        }
+        .ui.footer.segment {
+          margin: 2em 0em 0em;
+          padding: 2em 0em;
+        }
+    </style>  
 </head>
 <body>
-    <div id="app">
-        <h1>MapleStory HEXA Stat Calculator</h1>
+    <div class="ui fixed inverted menu">
+        <div class="ui container">
+            <a href="#" class="header item">
+            </a>
+            <a href="#" class="item">Home</a>
+            <div class="ui simple dropdown item">
+            </div>
+          </div>
+    </div>
+    <div id="app" class="ui main container">
+        <h1 class="ui header">MapleStory HEXA Stat Calculator</h1>
+        <hr/>
         
-        <table>
-            <tr><td></td><td>Main Stat</td><td>Additional Stats 1</td><td>Additional Stats 2</td></tr>
-            <tr v-for="i,k in mains">
-                <td>Core {{k+1}}</td>
-                <td><input v-model.number="mains[k]" type="number" min="0" max="10"></td>
-                <td><input v-model.number="sec0s[k]" type="number" min="0" max="10"></td>
-                <td><input v-model.number="sec1s[k]" type="number" min="0" max="10"></td>
-            </tr> 
-        </table>
+        <div class="ui segment">
+            <div class="ui two column very relaxed grid">
+                <div class="column">
+                    <h3>HEXA Stat Levels<i v-tooltip data-content="Please input your HEXA stat levels." class="info circle icon"></i></h3>
+                    <table class="ui celled table">
+                        <thead><tr><th></th><th>Main Stat</th><th>Additional Stat 1</th><th>Additional Stat 2</th></tr></thead>
+                        <tbody>
+                            <tr v-for="i,k in shownum">
+                                <td>Core {{k+1}}</td>
+                                <td><div class="ui small input fluid"><input v-model.number="mains[k]" type="number" min="0" max="10"></div></td>
+                                <td><div class="ui small input fluid"><input v-model.number="sec0s[k]" type="number" min="0" max="10"></div></td>
+                                <td><div class="ui small input fluid"><input v-model.number="sec1s[k]" type="number" min="0" max="10"></div></td>
+                            </tr> 
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="ui vertical divider"></div>
+        </div>
 
-        <div>
-            <h3>Stat Conversion</h3>
-            <table>
-                <tr><td>1 mainstat% </td><td>= </td><td><input v-model.number="msp2ms" type="number" min="0" max="100"> main stat</td></tr>
-                <tr><td>1 att </td><td>= </td><td><input v-model.number="att2ms" type="number" min="0" max="100"> main stat </td></tr>
-                <tr><td>8 crit damage </td><td>= </td><td><input v-model.number="cdmg82msp" type="number" min="0" max="100"> mainstat% </td></tr>
-                <tr><td>40 boss </td><td>= </td><td><input v-model.number="boss402attp" type="number" min="0" max="100"> att% </td></tr>
-                <tr><td>1 IED </td><td>= </td><td><input v-model.number="ied2boss" type="number" min="0" max="100"> boss </td></tr>
-                <tr><td>All mainstat% </td><td> :</td><td><input v-model.number="allmstatp" type="number" min="0" max="1000"> % </td></tr>
-                <tr><td>All att </td><td> :</td><td><input v-model.number="allatt" type="number" min="0" max="100000"> att </td></tr>
-                <tr><td>All att% </td><td> :</td><td><input v-model.number="allattp" type="number" min="0" max="1000"> att% </td></tr>
-                <tr><td>All mainstat </td><td> :</td><td><input v-model.number="allmstat" type="number" min="0" max="200000"> main stat </td></tr>
+        <div class="ui segment">
+            <div class="ui two column very relaxed grid">
+              <div class="column">
+                <h3>Stat Conversion<i v-tooltip data-content="Please input the stats of your character. You can also use the default values, which is for my character :-)" class="info circle icon"></i></h3>
+                <table class="ui table">
+                    <tr><td>1 mainstat% </td><td>= </td>
+                        <td><div class="ui small input" style="width: 100px;"><input v-model.number="msp2ms" type="number" min="0" max="100"></div> main stat
+                            <i v-tooltip data-content="This is the same as the FLAME score calculation. It should be slightly lower than the conversion of allstat% flame." class="info circle icon"></i></td></tr>
+                    <tr><td>1 att </td><td>= </td>
+                        <td><div class="ui small input" style="width: 100px;"><input v-model.number="att2ms" type="number" min="0" max="100"></div> main stat 
+                            <i v-tooltip data-content="This is the same as the FLAME score calculation. " class="info circle icon"></i></td></tr>
+                    <tr><td>8 crit damage </td><td>= </td>
+                        <td><div class="ui small input" style="width: 100px;"><input v-model.number="cdmg82msp" type="number" min="0" max="100"></div> mainstat% 
+                            <i v-tooltip data-content="In terms of glove potential, the 8 critdmg line is slightly better than 2 mstat% lines." class="info circle icon"></i></td></tr>
+                    <tr><td>40 boss </td><td>= </td>
+                        <td><div class="ui small input" style="width: 100px;"><input v-model.number="boss402attp" type="number" min="0" max="100"></div> att% 
+                            <i v-tooltip data-content="In terms of weapon potential, we always prefer 13 att% than 40 boss%." class="info circle icon"></i></td></tr>
+                    <tr><td>1 IED </td><td>= </td>
+                        <td><div class="ui small input" style="width: 100px;"><input v-model.number="ied2boss" type="number" min="0" max="100"></div> boss 
+                            <i v-tooltip data-content="Just estimate how much IED you will need." class="info circle icon"></i></td></tr>
+                    <tr><td>All mainstat% </td><td> :</td>
+                        <td><div class="ui small input" style="width: 100px;"><input v-model.number="allmstatp" type="number" min="0" max="1000"></div> % 
+                            <i v-tooltip data-content="Computed by the Weapon Jump Ring or Pinkbean Cups, or by hand." class="info circle icon"></i></td></tr>
+                    <tr><td>All att </td><td> :</td>
+                        <td><div class="ui small input" style="width: 100px;"><input v-model.number="allatt" type="number" min="0" max="100000"></div> att 
+                            <i v-tooltip data-content="Just look at your character stats." class="info circle icon"></i></td></tr>
+                    <tr><td>All att% </td><td> :</td>
+                        <td><div class="ui small input" style="width: 100px;"><input v-model.number="allattp" type="number" min="0" max="1000"></div> att% 
+                            <i v-tooltip data-content="Just look at your character stats." class="info circle icon"></i></td></tr>
+                    <tr><td>All mainstat </td><td> :</td>
+                        <td><div class="ui small input" style="width: 100px;"><input v-model.number="allmstat" type="number" min="0" max="200000"></div> main stat 
+                            <i v-tooltip data-content="Just look at your character stats." class="info circle icon"></i></td></tr>
+                </table>
+              </div>
+              <div class="column">
+                <h3>Score Estimate</h3>
+                <table class="ui large table">
+                    <tr><td>5 att </td><td>= </td><td> {{scatt5}} main stat</td></tr>
+                    <tr><td>0.35% crit damage </td><td>= </td><td> {{sccd35}} main stat</td></tr>
+                    <tr><td>100 final stat </td><td>= </td><td> {{scms100}} main stat</td></tr>
+                    <tr><td>1% boss </td><td>= </td><td> {{scboss}} main stat</td></tr>
+                    <tr><td>1% IED </td><td>= </td><td> {{scied}} main stat</td></tr>
+                    <tr><td>0.75% damage </td><td>= </td><td> {{scdmg75}} main stat</td></tr>
+                </table>
+                <button class="ui button" v-on:click="search">Search the Best Settings</button>
+                <h2>Result: +{{result}} main stats; +{{fd}}% FD <i v-tooltip data-content="I ignore the impact of secondary stat." class="info circle icon"></i></h2>
+              </div>
+            </div>
+            <div class="ui vertical divider"></div>
+          </div>
+
+        <div class="ui segment" id="result">
+            <h3>Best Settings</h3>
+            <table v-if="plan" class="ui celled large table">
+                <thead><tr><th></th><th>Main Stat</th><th>Additional Stat 1</th><th>Additional Stat 2</th></tr></thead>
+                <tbody>
+                    <tr v-for="i,k in resultnum">
+                        <td>Core {{k+1}}</td>
+                        <td>{{mains[k]}}x <div class="ui olive label" style="width:70px;">{{plan[k][0][0]}}</div> +{{plan[k][0][1]}} (= {{plan[k][0][2]}} m.stat)</td>
+                        <td>{{sec0s[k]}}x <div class="ui olive label" style="width:70px;">{{plan[k][1][0]}}</div> +{{plan[k][1][1]}} (= {{plan[k][1][2]}} m.stat)</td>
+                        <td>{{sec1s[k]}}x <div class="ui olive label" style="width:70px;">{{plan[k][2][0]}}</div> +{{plan[k][2][1]}} (= {{plan[k][2][2]}} m.stat)</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
-        <div>
-            <h3>Score Estimate</h3>
-            <table>
-                <tr><td>5 att </td><td>= </td><td> {{scatt5}} main stat</td></tr>
-                <tr><td>0.35% crit damage </td><td>= </td><td> {{sccd35}} main stat</td></tr>
-                <tr><td>100 final stat </td><td>= </td><td> {{scms100}} main stat </td></tr>
-                <tr><td>1% boss </td><td>= </td><td> {{scboss}} main stat</td></tr>
-                <tr><td>1% IED </td><td>= </td><td> {{scied}} main stat</td></tr>
-                <tr><td>0.75% damage </td><td>= </td><td> {{scdmg75}} main stat</td></tr>
-            </table>
-        </div>
-        <div>
-            <button v-on:click="search">Search</button>
-            Result: +{{result}} main stats
-            <table v-if="plan">
-                <tr><td></td><td>Main Stat</td><td>Additional Stats 1</td><td>Additional Stats 2</td></tr>
-                <tr v-for="i,k in mains">
-                    <td>Core {{k+1}}</td>
-                    <td>{{mains[k]}}x{{plan[k][0]}}</td>
-                    <td>{{sec0s[k]}}x{{plan[k][1]}}</td>
-                    <td>{{sec1s[k]}}x{{plan[k][2]}}</td>
-                </tr>
-            </table>
+    </div>
+    <div class="ui inverted vertical footer segment">
+        <div class="ui center aligned container">
+            <div class="ui horizontal inverted small divided link list">
+                Made by AdamaxOptim (GMS Elysium)
+            </div>
         </div>
     </div>
 
@@ -62,6 +137,9 @@
         function round2(num) {
             return Math.round(num * 100)/100;
         }
+        Vue.directive("tooltip", {
+            inserted: el => $(el).popup({})
+        });
         new Vue({
             el: '#app',
             data: {
@@ -80,7 +158,10 @@
                 scatt5: 0, sccd35: 0, scms100: 0, scboss: 0, scied: 0, scdmg75: 0,
                 mainlevs: [0, 1, 2, 3, 4, 6, 8, 10, 13, 16, 20],
                 result: 0,
-                plan: null
+                fd: 0,
+                plan: null,
+                shownum: [1,2,3],
+                resultnum: [1]
             },
             methods: {
                 calc_score() {
@@ -153,11 +234,12 @@
                             }
                         }
                     }
-                    this.result = sc[2**6-1][3**6-1];
+                    this.result = round2(sc[2**6-1][3**6-1]);
                     let plan = method[2**6-1][3**6-1];
                     this.plan = [];
                     let strs = ['att', 'critdmg', 'finalstat', 'boss', 'ied', 'dmg'];
                     let nums = [5, 0.35, 100, 1, 1, 0.75];
+                    let largei = 0;
                     for (let i=0; i < 6; i ++) {
                         let cur = [];
                         for (let j=0; j < 3; j ++) {
@@ -167,11 +249,16 @@
                             let equstat = round2(scs[obj] * lev);
                             let ifpr = "%";
                             if (obj == 0 || obj == 2) ifpr = "";
-                            let sr = strs[obj] + ' +' + num + ifpr + ' (=' + equstat + ' m.stat)';
-                            cur.push(sr);
+                            if (lev > 0 && i > largei) largei = i; 
+                            cur.push([strs[obj], num+ifpr, equstat]);
                         }
                         this.plan.push(cur);
                     }
+                    this.resultnum = [];
+                    for (let i=0; i < (largei+1); i++) this.resultnum.push(i);
+                    let height = document.body.clientHeight;
+                    setTimeout(()=>{window.scroll({top: height, behavior:"smooth"})}, 100);
+                    this.fd = round2(this.result * this.allmstatp / this.allmstat);
                 }
             },
             created: function() {
@@ -183,12 +270,16 @@
                         let newlev = 20 - this.mains[i] - this.sec0s[i];
                         if (this.sec1s[i] == 0 && newlev >= 0 && newlev <= 10) this.sec1s[i] = newlev;
                     }
+                    if (this.mains[2] + this.sec0s[2] + this.sec1s[2] > 0) 
+                        this.shownum = [1,2,3,4,5,6]      
                 },
                 mains() {
                     for (let i=0; i < 6; i ++) {
                         let newlev = 20 - this.mains[i] - this.sec0s[i];
                         if (this.sec1s[i] == 0 && newlev >= 0 && newlev <= 10) this.sec1s[i] = newlev;
                     }
+                    if (this.mains[2] + this.sec0s[2] + this.sec1s[2] > 0) 
+                        this.shownum = [1,2,3,4,5,6]                    
                 },
                 allmstat() { this.calc_score(); },
                 msp2ms() { this.calc_score(); },
