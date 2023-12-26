@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MapleStory HEXA Stat Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h1>MapleStory HEXA Stat Calculator</h1>
+        
+        <table>
+            <tr><td></td><td>Main Stat</td><td>Additional Stats 1</td><td>Additional Stats 2</td></tr>
+            <tr v-for="i,k in mains">
+                <td>Core {{k+1}}</td>
+                <td><input v-model.number="mains[k]" type="number" min="0" max="10"></td>
+                <td><input v-model.number="sec0s[k]" type="number" min="0" max="10"></td>
+                <td><input v-model.number="sec1s[k]" type="number" min="0" max="10"></td>
+            </tr> 
+        </table>
+
+        <div>
+            <h3>Stat Conversion</h3>
+            <table>
+                <tr><td>1 mainstat% </td><td>= </td><td><input v-model.number="msp2ms" type="number" min="0" max="100"> main stat</td></tr>
+                <tr><td>1 att </td><td>= </td><td><input v-model.number="att2ms" type="number" min="0" max="100"> main stat </td></tr>
+                <tr><td>8 crit damage </td><td>= </td><td><input v-model.number="cdmg82msp" type="number" min="0" max="100"> mainstat% </td></tr>
+                <tr><td>40 boss </td><td>= </td><td><input v-model.number="boss402attp" type="number" min="0" max="100"> att% </td></tr>
+                <tr><td>1 IED </td><td>= </td><td><input v-model.number="ied2boss" type="number" min="0" max="100"> boss </td></tr>
+                <tr><td>All mainstat% </td><td> :</td><td><input v-model.number="allmstatp" type="number" min="0" max="1000"> % </td></tr>
+                <tr><td>All att </td><td> :</td><td><input v-model.number="allatt" type="number" min="0" max="100000"> att </td></tr>
+                <tr><td>All att% </td><td> :</td><td><input v-model.number="allattp" type="number" min="0" max="1000"> att% </td></tr>
+                <tr><td>All mainstat </td><td> :</td><td><input v-model.number="allmstat" type="number" min="0" max="200000"> main stat </td></tr>
+            </table>
+        </div>
+        <div>
+            <h3>Score Estimate</h3>
+            <table>
+                <tr><td>5 att </td><td>= </td><td> {{scatt5}} main stat</td></tr>
+                <tr><td>0.35% crit damage </td><td>= </td><td> {{sccd35}} main stat</td></tr>
+                <tr><td>100 final stat </td><td>= </td><td> {{scms100}} main stat </td></tr>
+                <tr><td>1% boss </td><td>= </td><td> {{scboss}} main stat</td></tr>
+                <tr><td>1% IED </td><td>= </td><td> {{scied}} main stat</td></tr>
+                <tr><td>0.75% damage </td><td>= </td><td> {{scdmg75}} main stat</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function round2(num) {
+            return Math.round(num * 100)/100;
+        }
+        new Vue({
+            el: '#app',
+            data: {
+                mains: [6, 0, 0, 0, 0, 0],
+                sec0s: [8, 0, 0, 0, 0, 0],
+                sec1s: [6, 0, 0, 0, 0, 0],
+                msp2ms: 8,
+                att2ms: 2.5,
+                allmstatp: 713,
+                cdmg82msp: 25,
+                boss402attp: 10,
+                ied2boss: 0.9,
+                allatt: 8779,
+                allattp: 126,
+                allmstat: 74075,
+                scatt5: 0, sccd35: 0, scms100: 0, scboss: 0, scied: 0, scdmg75: 0
+            },
+            methods: {
+                calc_score() {
+                    this.scatt5 = round2(5 * this.att2ms);
+                    this.sccd35 = round2(0.35 * this.cdmg82msp / 8 * this.msp2ms);
+                    this.scms100 = round2(100 * 100 / this.allmstatp);
+                    let baseatt = this.allatt / (1 + this.allattp / 100);
+                    let attp2att = (baseatt * 0.01) / (1 + this.allattp / 100);
+                    this.scboss = round2(attp2att * this.att2ms * this.boss402attp / 40);
+                    this.scied = round2(this.scboss * this.ied2boss);
+                    this.scdmg75 = round2(this.scboss * 0.75);
+                },
+                search() {
+                    
+                }
+            },
+            created: function() {
+                this.calc_score();
+            },
+            watch: {
+                sec0s() {
+                    for (let i=0; i < 6; i ++) {
+                        let newlev = 20 - this.mains[i] - this.sec0s[i];
+                        if (this.sec1s[i] == 0 && newlev >= 0 && newlev <= 10) this.sec1s[i] = newlev;
+                    }
+                },
+                mains() {
+                    for (let i=0; i < 6; i ++) {
+                        let newlev = 20 - this.mains[i] - this.sec0s[i];
+                        if (this.sec1s[i] == 0 && newlev >= 0 && newlev <= 10) this.sec1s[i] = newlev;
+                    }
+                },
+                allmstat() { this.calc_score(); },
+                msp2ms() { this.calc_score(); },
+                att2ms() { this.calc_score(); },
+                allmstatp() { this.calc_score(); },
+                cdmg82msp() { this.calc_score(); },
+                boss402attp() { this.calc_score(); },
+                ied2boss() { this.calc_score(); },
+                allatt() { this.calc_score(); },
+                allattp() { this.calc_score(); }         
+            }
+
+        });
+    </script>
+</body>
+</html>
