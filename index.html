@@ -181,66 +181,109 @@
                 },
                 search() {
                     let scs = [this.scatt5, this.sccd35, this.scms100, this.scboss, this.scied, this.scdmg75];
-                    let sc = new Array(2**6);
-                    let method = new Array(2**6);
-                    for(var i = 0;i < sc.length; i++){
-                        sc[i] = new Array(3**6).fill(0);
-                        method[i] = new Array(3**6);
-                        for (var j=0; j < method[i].length; j++)
-                            method[i][j] = new Array(18).fill(-1);
+                    let plans = new Array(18).fill(-1);
+                    let stack = [0];
+                    let maxscore = 0, bestplan = new Array(18).fill(-1);
+                    let used = new Array(6).fill(0);
+                    let scores = new Array(18).fill(0);
+                    let total = 0, score = 0;
+                    let poped = true;
+                    let nodetot = new Array(6).fill(0);
+                    for (let i=0;i<6;i ++)
+                        nodetot[i] = (this.mains[i] + this.sec0s[i] + this.sec1s[i]);
+                    let sortsc = [this.scatt5, this.sccd35, this.scms100, this.scboss, this.scied, this.scdmg75];
+                    sortsc.sort(function(a,b){return b-a});
+                    console.log(sortsc);
+
+                    let poslev = new Array(19).fill(0);
+                    for (let i=0; i < 6; i ++) {
+                        poslev[i] = this.mainlevs[this.mains[i]];
+                        poslev[i+6] = this.sec0s[i];
+                        poslev[i+12] = this.sec1s[i];
                     }
-                    let que = [0, 0], qh = 0;
-                    while (qh < que.length) {
-                        let curm = que[qh], curs = que[qh+1];  qh += 2;
-                        let avam = [], avas = [];
-                        for (let i=0; i < 6; i ++) {
-                            if ((curm & (1 << i)) == 0) avam.push(i);
-                            if (parseInt(curs / (3**i)) % 3 < 2) avas.push(i);
-                        }
-                        console.log(curm, curs, avam, avas, method[curm][curs]);
-                        let newscore = 0;
-                        for (let i=0; i < avam.length; i ++) {
-                            let newm = curm | (1 << avam[i]);
-                            let news = curs;
-                            let positions = method[curm][curs];
-                            for (let j=0; j < 6; j ++) {
-                                if (positions[j] >= 0) continue;
-                                if (avam[i] == positions[j%6]) continue;
-                                if (avam[i] == positions[j%6+6]) continue;
-                                if (avam[i] == positions[j%6+12]) continue;
-                                newscore = sc[curm][curs] + this.mainlevs[this.mains[j]] * scs[avam[i]];
-                                if (newscore > sc[newm][news]) {
-                                    if (sc[newm][news] == 0) que.push(newm, news);
-                                    sc[newm][news] = newscore;
-                                    for (let k=0; k < 18; k ++)
-                                        method[newm][news][k] = method[curm][curs][k];
-                                    method[newm][news][j] = avam[i];
-                                }
-                            }
-                        }    
-                        for (let i=0; i < avas.length; i ++) {
-                            let newm = curm;
-                            let news = curs + (3 ** avas[i]);
-                            let positions = method[curm][curs];
-                            for (let j=0; j < 12; j ++) {
-                                if (positions[6+j] >= 0) continue;
-                                if (avas[i] == positions[j%6]) continue;
-                                if (avas[i] == positions[j%6+6]) continue;
-                                if (avas[i] == positions[j%6+12]) continue;
-                                if (j < 6) newscore = sc[curm][curs] + this.sec0s[j] * scs[avas[i]];
-                                else newscore = sc[curm][curs] + this.sec1s[j-6] * scs[avas[i]];
-                                if (newscore > sc[newm][news]) {
-                                    if (sc[newm][news] == 0) que.push(newm, news);
-                                    sc[newm][news] = newscore;
-                                    for (let k=0; k < 18; k ++)
-                                        method[newm][news][k] = method[curm][curs][k];
-                                    method[newm][news][6+j] = avas[i];
-                                }
-                            }
+                    
+                    let cumupper = new Array(19).fill(0);
+                    for (let i=6; i < 18; i ++) {
+                        let tk = poslev.slice(i, 18);
+                        tk.sort(function(a,b){return b-a});
+                        for (let j=0; j < 6; j ++) {
+                            if (j * 2 >= tk.length) break;
+                            cumupper[i] += tk[j*2] * sortsc[j];
+                            if (j * 2 + 1 >= tk.length) break;
+                            cumupper[i] += tk[j*2+1] * sortsc[j];
                         }
                     }
-                    this.result = round2(sc[2**6-1][3**6-1]);
-                    let plan = method[2**6-1][3**6-1];
+                    for (let i=0; i<6; i ++) {
+                        let tk = poslev.slice(i, 6);
+                        tk.sort(function(a,b){return b-a});
+                        cumupper[i] = cumupper[6];
+                        for (let j=0; j < tk.length; j ++) {
+                            cumupper[i] += tk[j] * sortsc[j];
+                        }                        
+                    }
+                    console.log(cumupper);
+
+                    while (stack.length > 0) {
+                        let i = stack[stack.length-1];
+                        if (i == 18) {
+                            total ++;
+                            if (total % 100000 == 0) console.log(total, maxscore);
+                            //console.log(plans);
+                            if (score > maxscore) {
+                                maxscore = score;
+                                for (let k=0; k < 18; k ++) bestplan[k] = plans[k];
+                            }
+                            stack.pop();
+                            poped = true;
+                            continue;
+                        }
+                        let curr = plans[i];
+                        if (poped && curr >= 0) {
+                            used[curr] --;
+                            score -= scores[i];
+                        }
+                        plans[i] ++;
+                        if (i == 5) 
+                        {
+                            let ep = 15 - plans[0] - plans[1] - plans[2] - plans[3] - plans[4];
+                            if (plans[i] < ep) plans[i] = ep;
+                            else if (plans[i] > ep) plans[i] = 7;
+                        }
+                        curr = plans[i];
+                    
+                        if (score + cumupper[i] <= maxscore) curr = 7;
+                        if (curr >= 6) {
+                            plans[i] = -1;
+                            stack.pop();
+                            poped = true;
+                            continue;
+                        } 
+                        poped = false;
+                        if (i < 6) {
+                            if (used[curr] > 0) continue;
+                        } else {
+                            if (used[curr] > 2) continue;
+                            if (nodetot[i%6] > 0) {
+                                if (i >= 6 && plans[i-6] == curr) continue;
+                                if (i >= 12 && plans[i-12] == curr) continue;
+                            }
+                        }
+                        poped = true;
+                        used[curr] ++;
+                        scores[i] = poslev[i] * scs[curr];
+                        score += scores[i];
+                        stack.push(i+1);
+                        if (i+1 < 18) plans[i+1] = -1;
+                    }
+                    // 348825600
+                    console.log(total, 348825600);
+                    this.showresult(maxscore, bestplan);
+                },
+                showresult(bestscore, bestplan) {
+                    console.log(bestplan);
+                    let scs = [this.scatt5, this.sccd35, this.scms100, this.scboss, this.scied, this.scdmg75];
+                    this.result = round2(bestscore);
+                    let plan = bestplan;
                     this.plan = [];
                     let strs = ['att', 'critdmg', 'finalstat', 'boss', 'ied', 'dmg'];
                     let nums = [5, 0.35, 100, 1, 1, 0.75];
@@ -264,6 +307,75 @@
                     let height = document.body.clientHeight;
                     setTimeout(()=>{window.scroll({top: height, behavior:"smooth"})}, 100);
                     this.fd = round2(this.result * this.allmstatp / this.allmstat);
+                },
+                search1() {
+                    let scs = [this.scatt5, this.sccd35, this.scms100, this.scboss, this.scied, this.scdmg75];
+                    let sc = new Array(2**6);
+                    let method = new Array(2**6);
+                    for(var i = 0;i < sc.length; i++){
+                        sc[i] = new Array(3**6).fill(0);
+                        method[i] = new Array(3**6);
+                        for (var j=0; j < method[i].length; j++)
+                            method[i][j] = new Array(18).fill(-1);
+                    }
+                    let nodetot = new Array(6).fill(0);
+                    for (let i=0;i<6;i ++)
+                        nodetot[i] = (this.mains[i] + this.sec0s[i] + this.sec1s[i]);
+                    let que = [0, 0], qh = 0;
+                    while (qh < que.length) {
+                        let curm = que[qh], curs = que[qh+1];  qh += 2;
+                        let avam = [], avas = [];
+                        for (let i=0; i < 6; i ++) {
+                            if ((curm & (1 << i)) == 0) avam.push(i);
+                            if (parseInt(curs / (3**i)) % 3 < 2) avas.push(i);
+                        }
+                        //console.log(curm, curs, avam, avas, method[curm][curs]);
+                        let newscore = 0;
+                        for (let i=0; i < avam.length; i ++) {
+                            let newm = curm | (1 << avam[i]);
+                            let news = curs;
+                            let positions = method[curm][curs];
+                            for (let j=0; j < 6; j ++) {
+                                if (positions[j] >= 0) continue;
+                                if (nodetot[j] > 0) {
+                                    if (avam[i] == positions[j%6]) continue;
+                                    if (avam[i] == positions[j%6+6]) continue;
+                                    if (avam[i] == positions[j%6+12]) continue;
+                                }
+                                newscore = sc[curm][curs] + this.mainlevs[this.mains[j]] * scs[avam[i]];
+                                if (newscore > sc[newm][news]) {
+                                    if (sc[newm][news] == 0) que.push(newm, news);
+                                    sc[newm][news] = newscore;
+                                    for (let k=0; k < 18; k ++)
+                                        method[newm][news][k] = method[curm][curs][k];
+                                    method[newm][news][j] = avam[i];
+                                }
+                            }
+                        }    
+                        for (let i=0; i < avas.length; i ++) {
+                            let newm = curm;
+                            let news = curs + (3 ** avas[i]);
+                            let positions = method[curm][curs];
+                            for (let j=0; j < 12; j ++) {
+                                if (positions[6+j] >= 0) continue;
+                                if (nodetot[j%6] > 0) {
+                                    if (avas[i] == positions[j%6]) continue;
+                                    if (avas[i] == positions[j%6+6]) continue;
+                                    if (avas[i] == positions[j%6+12]) continue;
+                                }
+                                if (j < 6) newscore = sc[curm][curs] + this.sec0s[j] * scs[avas[i]];
+                                else newscore = sc[curm][curs] + this.sec1s[j-6] * scs[avas[i]];
+                                if (newscore > sc[newm][news]) {
+                                    if (sc[newm][news] == 0) que.push(newm, news);
+                                    sc[newm][news] = newscore;
+                                    for (let k=0; k < 18; k ++)
+                                        method[newm][news][k] = method[curm][curs][k];
+                                    method[newm][news][6+j] = avas[i];
+                                }
+                            }
+                        }
+                    }
+                    this.showresult(sc[2**6-1][3**6-1], method[2**6-1][3**6-1]);
                 }
             },
             created: function() {
